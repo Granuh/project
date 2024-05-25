@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Application</string>
+    <string name="String_1">Вход</string>
+    <string name="String_2">Регистрация</string>
+    <string name="String_3">Забыли пароль?</string>
+    <string name="String_4">Название приложения</string>
+    <string name="String_5">Регистрация нового пользователя</string>
+    <string name="String_6">Логин</string>
+    <string name="String_7">Пароль</string>
+    <string name="String_8">Email</string>
+    <string name="String_9">Зарегистрироваться</string>
+    <string name="String_10">Назад</string>
+    <string name="String_11">Введите логин</string>
+    <string name="String_12">Введите пароль</string>
+    <string name="String_13">Введите email</string>
+    <string name="String_14">Настройки</string>
+    <string name="String_15">Выйти из аккаунта</string>
+    <string name="open_nav">Open</string>
+    <string name="close_nav">Close</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
