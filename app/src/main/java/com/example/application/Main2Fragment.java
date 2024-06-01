@@ -1,14 +1,15 @@
 package com.example.application;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,22 +23,29 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
+
 import com.bumptech.glide.Glide;
 
 public class Main2Fragment extends Fragment {
 
     ProgressBar progressBar;
     GridLayout gridLayout;
-    TextView tvAnalogs, tvRus, tvAlt;
+    TextView tvAnalogsAlt, tvAnalogsRus,  tvRus, tvAlt;
     ImageView ivIcon, ivAudio1, ivAudio2;
     Button bAnalogs, bWordNext;
     private WordModel wordModel;
+    private WordAnalogsModel wordAnalogs;
     private MediaPlayer mediaPlayer;
     private List<Word> words;
+    private List<WordAnalogs> wordsAnalogs;
     private int index = 0;
+    private int WordAnalogsIndex = 0;
     boolean IsVisible = false;
     RecyclerView recyclerView;
     WordAdapter wordAdapter;
+    WordAdapterAnalogs wordAdapterAnalogs;
+    TextToSpeech textToSpeech;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -49,30 +57,45 @@ public class Main2Fragment extends Fragment {
         // Inflate the layout for this fragment
         //return inflater.inflate(R.layout.fragment_main2, container, false);
 
-        progressBar = view.findViewById(R.id.progress_bar);
+        //progressBar = view.findViewById(R.id.progress_bar);
 
-        gridLayout = view.findViewById(R.id.grid_layout);
+        //gridLayout = view.findViewById(R.id.grid_layout);
 
-        bAnalogs = view.findViewById(R.id.bAnalogs);
+        //bAnalogs = view.findViewById(R.id.bAnalogs);
         bWordNext = view.findViewById(R.id.bWordNext);
 
         tvAlt = view.findViewById(R.id.tvAlt);
         tvRus = view.findViewById(R.id.tvRus);
-        tvAnalogs = view.findViewById(R.id.tvAnalogs);
+        tvAnalogsAlt = view.findViewById(R.id.tvAnalogsAlt);
+        tvAnalogsRus = view.findViewById(R.id.tvAnalogsRus);
 
         ivIcon = view.findViewById(R.id.ivIcon);
         ivAudio1 = view.findViewById(R.id.ivAudio1);
         ivAudio2 = view.findViewById(R.id.ivAudio2);
 
-        recyclerView = view.findViewById(R.id.recycleView);
+        recyclerView = view.findViewById(R.id.recycleView_2);
 
         wordModel = new WordModel(requireContext());
         words = wordModel.GetAllWords();
 
-        wordAdapter = new WordAdapter(requireContext(), words);
-        recyclerView.setAdapter(wordAdapter);
+        wordAnalogs = new WordAnalogsModel(requireContext());
+        //wordsAnalogs = wordAnalogs.GetAllWordsAnalogs();
+        wordsAnalogs = wordAnalogs.GetAllWordsAnalogsId(WordAnalogsIndex, 3);
+
+        WordAdapterAnalogs.OnWordAnalogsClickListener wordAnalogsClickListener = new WordAdapterAnalogs.OnWordAnalogsClickListener() {
+            @Override
+            public void onWordAnalogsClick(WordAnalogs wordAnalogs, int position) {
+                //Toast.makeText(requireContext(), "Было выбрано слово " + wordAnalogs.GetWordAnalogsAlt(), Toast.LENGTH_SHORT).show();
+                updateFragmentWord(position);
+            }
+        };
+
+        wordAdapterAnalogs = new WordAdapterAnalogs(requireContext(), wordsAnalogs, wordAnalogsClickListener);
+
+        recyclerView.setAdapter(wordAdapterAnalogs);
 
         updateFragment();
+        UpdateAdapter(requireContext(), wordsAnalogs, recyclerView, wordAnalogsClickListener);
 
         Word word = words.get(index);
 
@@ -80,7 +103,10 @@ public class Main2Fragment extends Fragment {
             @Override
             public void onClick(View view) {
                 index = (index + 1) % words.size();
+                WordAnalogsIndex = WordAnalogsIndex + 3;
                 updateFragment();
+                wordsAnalogs = wordAnalogs.GetAllWordsAnalogsId(WordAnalogsIndex, 3);
+                UpdateAdapter(requireContext(), wordsAnalogs, recyclerView, wordAnalogsClickListener);
             }
         });
 
@@ -98,30 +124,18 @@ public class Main2Fragment extends Fragment {
             }
         });
 
-        bAnalogs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (IsVisible) {
-                    gridLayout.setVisibility(View.GONE);
-                    progressBar.setVisibility(View.GONE);
-                    tvAnalogs.setVisibility(View.GONE);
-                    IsVisible = false;
-                }
-                else {
-                    gridLayout.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.VISIBLE);
-                    tvAnalogs.setVisibility(View.VISIBLE);
-                    tvAnalogs.setText("118/153 %");
-                    IsVisible = true;
-                }
-            }
-        });
-
         return  view;
+    }
+
+    private void UpdateAdapter(Context context, List<WordAnalogs> wordsAnalogs, RecyclerView recyclerView, WordAdapterAnalogs.OnWordAnalogsClickListener wordAnalogsClickListener){
+        wordAdapterAnalogs = new WordAdapterAnalogs(context, wordsAnalogs, wordAnalogsClickListener);
+        recyclerView.setAdapter(wordAdapterAnalogs);
     }
 
     private void GameWordSoundOnAlt() {
         Word word = words.get(index);
+        String str = tvAlt.getText().toString();
+
         if (word != null && !TextUtils.isEmpty(word.GetWordOnAlt())) {
             try {
                 if (mediaPlayer == null) {
@@ -130,18 +144,21 @@ public class Main2Fragment extends Fragment {
                     mediaPlayer.reset();
                 }
 
-                int soundResource = getResources().getIdentifier(word.GetWordOnAlt(), "raw", requireContext().getPackageName());
-                if (soundResource != 0) {
-                    mediaPlayer.setDataSource(requireContext(), Uri.parse("android.resource://" + requireContext().getPackageName() + "/" + soundResource));
+                if (word.GetWordOnAlt() != null && word.GetWordOnAlt().equals(str)) {
+                    int soundResource = getResources().getIdentifier(word.GetWordOnAlt(), "raw", requireContext().getPackageName());
+                    if (soundResource != 0) {
+                        mediaPlayer.setDataSource(requireContext(), Uri.parse("android.resource://" + requireContext().getPackageName() + "/" + soundResource));
+                        mediaPlayer.prepare();
+                        mediaPlayer.start();
+                    } else {
+                        //Toast.makeText(requireContext(), "Ошибка с воспроизведением audio!", Toast.LENGTH_SHORT).show();
+                        SpeakOnAlt(str);
+                    }
                 } else {
-                    Toast.makeText(getContext(), "Ошибка с воспроизведением audio2!", Toast.LENGTH_SHORT).show();
-                    return;
+                    SpeakOnAlt(tvAlt.getText().toString());
                 }
-
-                mediaPlayer.prepare();
-                mediaPlayer.start();
             } catch (IOException e) {
-                Toast.makeText(getContext(), "Ошибка с воспроизведением audio2!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Ошибка с воспроизведением audio!", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         }
@@ -149,6 +166,8 @@ public class Main2Fragment extends Fragment {
 
     private void GameWordSoundOnRus() {
         Word word = words.get(index);
+        String str = tvAlt.getText().toString();
+
         if (word != null && !TextUtils.isEmpty(word.GetWordOnRus())) {
             try {
                 if (mediaPlayer == null) {
@@ -157,26 +176,77 @@ public class Main2Fragment extends Fragment {
                     mediaPlayer.reset();
                 }
 
-                int soundResource = getResources().getIdentifier(word.GetWordOnRus(), "raw", requireContext().getPackageName());
-                if (soundResource != 0) {
-                    mediaPlayer.setDataSource(requireContext(), Uri.parse("android.resource://" + requireContext().getPackageName() + "/" + soundResource));
+                if (word.GetWordOnRus() != null && word.GetWordOnRus().equals(str)) {
+                    int soundResource = getResources().getIdentifier(word.GetWordOnRus(), "raw", requireContext().getPackageName());
+                    if (soundResource != 0) {
+                        mediaPlayer.setDataSource(requireContext(), Uri.parse("android.resource://" + requireContext().getPackageName() + "/" + soundResource));
+                        mediaPlayer.prepare();
+                        mediaPlayer.start();
+                    } else {
+                        //Toast.makeText(requireContext(), "Ошибка с воспроизведением audio!", Toast.LENGTH_SHORT).show();
+                        SpeakOnAlt(str);
+                    }
                 } else {
-                    Toast.makeText(getContext(), "Ошибка с воспроизведением audio!", Toast.LENGTH_SHORT).show();
-                    return;
+                    SpeakOnRus(tvRus.getText().toString());
                 }
-
-                mediaPlayer.prepare();
-                mediaPlayer.start();
             } catch (IOException e) {
-                Toast.makeText(getContext(), "Ошибка с воспроизведением audio!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Ошибка с воспроизведением audio!", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void SpeakOnRus(String str) {
+        textToSpeech = new TextToSpeech(requireContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if (i != TextToSpeech.ERROR) {
+                    textToSpeech.setLanguage(new Locale("ru-RU"));
+                    textToSpeech.speak(str, TextToSpeech.QUEUE_FLUSH, null, null);
+                }
+            }
+        });
+    }
+
+    private void SpeakOnAlt(String str) {
+        textToSpeech = new TextToSpeech(requireContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if (i != TextToSpeech.ERROR) {
+                    textToSpeech.setLanguage(new Locale("ky-KY"));
+                    textToSpeech.speak(str, TextToSpeech.QUEUE_FLUSH, null, null);
+                }
+            }
+        });
+    }
+
+    private void updateFragmentWord(int postion) {
+        WordAnalogs wordAnalogs = wordsAnalogs.get(postion);
+
+        tvAlt.setText(wordAnalogs.GetWordAnalogsAlt());
+        tvRus.setText(wordAnalogs.GetWordAnalogsRus());
+
+        if (wordAnalogs.GetWordAnalogsImage() != null && !wordAnalogs.GetWordAnalogsImage().isEmpty()) {
+            int resImage = getResources().getIdentifier(wordAnalogs.GetWordAnalogsImage(), "drawable", requireContext().getPackageName());
+            if (resImage != 0){
+                Glide.with(this)
+                        .load(resImage)
+                        .into(ivIcon);
+            } else {
+                ivIcon.setImageResource(R.drawable.alert);
+            }
+        }
+        else {
+            ivIcon.setImageResource(R.drawable.alert);
         }
     }
 
     private void updateFragment(){
         if (index == 21) {
             index = 0;
+        }
+        if (WordAnalogsIndex == 63) {
+            WordAnalogsIndex = 0;
         }
         Word word = words.get(index);
 

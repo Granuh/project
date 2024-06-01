@@ -170,7 +170,7 @@ public class TestFiveFragment extends Fragment {
     }
 
     private void updateFragment(){
-        if (index == 105){
+        if (index == 105 || index == 0){
             DialogFragment dialog = Dialog.newInstance(errNums, 5);
             dialog.show(getParentFragmentManager(), "Dialog");
 

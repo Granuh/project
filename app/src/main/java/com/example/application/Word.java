@@ -1,5 +1,7 @@
 package com.example.application;
 
+import java.util.List;
+
 public class Word {
     public int Id;
     public String WordAlt;
@@ -7,7 +9,6 @@ public class Word {
     public String WordSoundOnRus;
     public String WordSoundOnAlt;
     public String WordImage;
-    //public List<String> analogsList;
 
     public Word(){
 

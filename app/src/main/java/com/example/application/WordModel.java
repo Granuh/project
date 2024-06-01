@@ -2,6 +2,7 @@ package com.example.application;
 
 import static com.example.application.DataBaseBHelper.TableWords;
 import static com.example.application.DataBaseBHelper.WordAlt;
+import static com.example.application.DataBaseBHelper.WordAnalogs;
 import static com.example.application.DataBaseBHelper.WordImage;
 import static com.example.application.DataBaseBHelper.WordRus;
 import static com.example.application.DataBaseBHelper.WordSoundOnAlt;
@@ -12,8 +13,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class WordModel {
@@ -45,6 +48,7 @@ public class WordModel {
                 String WordSoundOrRus = cursor.getString(cursor.getColumnIndexOrThrow(DB_Helper.WordSoundOnRus));
                 String WordSoundOnAlt = cursor.getString(cursor.getColumnIndexOrThrow(DB_Helper.WordSoundOnAlt));
                 String WordImage = cursor.getString(cursor.getColumnIndexOrThrow(DB_Helper.WordImage));
+
                 Word word = new Word(id, WordAlt, WordARus, WordSoundOrRus, WordSoundOnAlt, WordImage);
                 words.add(word);
             } while (cursor.moveToNext());

@@ -2,20 +2,15 @@ package com.example.application;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.TextToSpeechService;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,8 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-
-import com.bumptech.glide.Glide;
 
 public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
     private List<Word> words;
@@ -65,16 +58,19 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
                         holder.mediaPlayer.reset();
                     }
 
-                    int soundResource = holder.context.getResources().getIdentifier(word.GetWordOnRus(), "raw", holder.context.getPackageName());
-                    if (soundResource != 0) {
-                        holder.mediaPlayer.setDataSource(holder.context, Uri.parse("android.resource://" + holder.context.getPackageName() + "/" + soundResource));
+                    if (word.GetWordOnRus() != null) {
+                        int soundResource = holder.context.getResources().getIdentifier(word.GetWordOnRus(), "raw", holder.context.getPackageName());
+                        if (soundResource != 0) {
+                            holder.mediaPlayer.setDataSource(holder.context, Uri.parse("android.resource://" + holder.context.getPackageName() + "/" + soundResource));
+                            holder.mediaPlayer.prepare();
+                            holder.mediaPlayer.start();
+                        } else {
+                            Toast.makeText(holder.context, "Ошибка с воспроизведением audio!", Toast.LENGTH_SHORT).show();
+                            //Speak(holder.tvRus.getText().toString());
+                        }
                     } else {
-                        Toast.makeText(holder.context, "Ошибка с воспроизведением audio!", Toast.LENGTH_SHORT).show();
-                        return;
+                        Speak(holder.tvRus.getText().toString());
                     }
-
-                    holder.mediaPlayer.prepare();
-                    holder.mediaPlayer.start();
                 } catch (IOException e) {
                     Toast.makeText(holder.context, "Ошибка с воспроизведением audio!", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();

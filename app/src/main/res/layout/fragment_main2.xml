@@ -101,17 +101,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <Button
-                android:id="@+id/bAnalogs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:layout_marginRight="50dp"
-                android:text="Показать слова аналоги"
-                android:textSize="16dp">
-
-            </Button>
-
             <ProgressBar
                 android:id="@+id/progress_bar"
                 android:layout_width="fill_parent"
@@ -126,36 +115,8 @@
 
             </ProgressBar>
 
-            <TextView
-                android:id="@+id/tvAnalogs"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_alignBottom="@id/progress_bar"
-                android:background="@android:color/transparent">
-
-            </TextView>
-
-            <GridLayout
-                android:id="@+id/grid_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="invisible">
-
-                <TextView
-                    android:id="@+id/tvAssociacWord"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:layout_margin="80dp"
-                    android:textSize="20sp"
-                    android:text="тöрöл (родина; родной) 153;
-                    jер (земля) 118;" />
-
-            </GridLayout>
-
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycleView"
+                android:id="@+id/recycleView_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 

@@ -47,7 +47,7 @@ public class lesson_5 extends AppCompatActivity implements NavigationView.OnNavi
             Intent intent = new Intent(this, lesson_1.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        } else if (view.getId() == R.id.bLesson_1){
+        } else if (view.getId() == R.id.bLesson_2){
             Intent intent = new Intent(this, lesson_2.class);
             //intent.putExtra("login", login);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

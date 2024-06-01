@@ -55,7 +55,6 @@ public class VocabularyFragment extends Fragment {
         etWordOnRus = view.findViewById(R.id.etWordOnRus);
 
         recyclerView = view.findViewById(R.id.recycleView);
-        //recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         wordModel = new WordModel(getContext());
         words = wordModel.GetAllWords();
@@ -70,6 +69,11 @@ public class VocabularyFragment extends Fragment {
                 String alt = etWordOnAlt.getText().toString();
                 String rus = etWordOnRus.getText().toString();
 
+                if (alt.equals("") || rus.equals("")) {
+                    Toast.makeText(requireContext(), "Поля пустые!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 word.SetWordAlt(alt);
                 word.SetWordRus(rus);
 
@@ -77,7 +81,7 @@ public class VocabularyFragment extends Fragment {
 
                 words = wordModel.GetAllWords();
 
-                UpdateAdapte(requireContext(), words, recyclerView, wordAdapter);
+                UpdateAdapter(requireContext(), words, recyclerView, wordAdapter);
             }
         });
 
@@ -93,7 +97,7 @@ public class VocabularyFragment extends Fragment {
         return view;
     }
 
-    private void UpdateAdapte(Context context, List<Word> words, RecyclerView recyclerView, WordAdapter wordAdapter){
+    private void UpdateAdapter(Context context, List<Word> words, RecyclerView recyclerView, WordAdapter wordAdapter){
         wordAdapter = new WordAdapter(context, words);
         recyclerView.setAdapter(wordAdapter);
     }
